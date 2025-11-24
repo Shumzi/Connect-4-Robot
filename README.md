@@ -1,25 +1,25 @@
 # Connect 4 Robot
 
-A robotic Connect 4 game where a MyCobot 280 robot arm plays against a human player. The system uses computer vision-free drop detection via LED strip sensors, automated puck dispensing with solenoids, and AI-powered gameplay.
+A robotic Connect 4 game where a MyCobot 280 robot arm plays against a human player. The system uses drop detection via LED strip sensors, automated puck dispensing with solenoids, and AI-powered gameplay.
 
 ## System Overview
 
 ```
-┌─────────────────────────────────────────────┐
-│                PC MAIN CONTROLLER           │
-│  ┌────────────┬────────────┐               │
-│  │   Robot    │   Arduino  │               │
-│  │ Interface  │ Interface  │               │
-│  └────────────┴────────────┘               │
-└─────────────┬──────┬───────────────────────┘
+┌───────────────────────────────────┐
+│       PC MAIN CONTROLLER          │
+│   ┌────────────┬────────────┐     │
+│   │   Robot    │   Arduino  │     │
+│   │ Interface  │ Interface  │     │
+│   └────────────┴────────────┘     │
+└─────────────┬──────┬──────────────┘
               │      │
         USB Serial   USB Serial
               │      │
-     ┌────────▼─┐ ┌───▼─────────────┐
-     │  Robot   │ │   Arduino       │
-     │  Arm     │ │ - LED Strip     │
-     │ (MyCobot)│ │ - Solenoids     │
-     │          │ │ - Sensors       │
+     ┌────────▼─┐ ┌───▼────────────┐
+     │  Robot   │ │   Arduino      │
+     │  Arm     │ │ - LED Strip    │
+     │  (via    │ | - Solenoids    │
+     │pymycobot)│ │ - Sensors      │
      └──────────┘ └────────────────┘
 ```
 
@@ -29,7 +29,7 @@ The system consists of three main controllers:
 
 1. **PC Main Controller** - Orchestrates gameplay, runs AI, manages state
 2. **Arduino Controller** - Handles LED strip, solenoid puck release, drop detection sensors
-3. **MyCobot 280 Robot Arm** - Picks and places pucks, delivers pucks to player
+3. **MyCobot 280 Robot Arm** - Picks and places pucks (using connected pump), delivers pucks to player
 
 ### Design Philosophy
 
@@ -67,11 +67,13 @@ connect4-robot/
 │
 ├── arduino_controller/        # Arduino firmware
 │   └── arduino_main/
-│       ├── arduino_main.ino   # Main sketch
-│       ├── config.h           # Pin definitions
-│       ├── led_control.h/.cpp # LED strip management
-│       ├── solenoid_control.h/.cpp # Puck release system
-│       └── sensor_handler.h/.cpp   # Drop detection
+│   |   ├── arduino_main.ino   # Main sketch
+│   |   ├── config.h           # Pin definitions
+│   |   ├── led_control.h/.cpp # LED strip management
+│   |   ├── solenoid_control.h/.cpp # Puck release system
+│   |   └── sensor_handler.h/.cpp   # Drop detection
+|   └── test_sketches
+|       └─ test_sensors.ino
 │
 ├── robot_arm/                 # Robot-specific files
 │   ├── positions.json         # Calibrated arm positions
@@ -106,7 +108,7 @@ connect4-robot/
 
 ### Arduino Interface (`hardware/arduino.py`)
 - **Responsibilities**: Serial communication, command sending, event callbacks
-- **Commands**: `RELEASE:<col>`, `LED:<col>:<R,G,B>`, `RESET`, `STATUS`
+- **Commands**: `RELEASE:<col>`, `LED:[ON/OFF]`, `RESET`, `STATUS`
 - **Events**: `DROP:<col>` (puck detected), `READY`, `ERROR:<msg>`
 - **Thread Model**: Background listener thread for async event handling
 
@@ -137,8 +139,8 @@ connect4-robot/
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd connect4-robot
+   git clone https://github.com/Shumzi/Connect-4-Elephant-Robotics.git
+   cd Connect-4-Elephant-Robotics
    ```
 
 2. **Install Python dependencies**
@@ -160,7 +162,7 @@ connect4-robot/
        baudrate: 115200
      arduino:
        port: "/dev/ttyUSB1"  # Adjust for your system
-       baudrate: 9600
+       baudrate: 115200
    
    game:
      ai_depth: 4  # Minimax search depth (4 = good balance)
@@ -207,7 +209,7 @@ python simulation/test_game_flow.py
 4. PC calculates best move and robot executes (picks red puck, drops in column)
 5. Robot returns and gives next yellow puck to player
 6. Repeat until someone wins or board is full
-7. System displays winner via LED pattern and resets for new game
+7. System displays winner via XXX??? and resets for new game
 
 ## Development
 
@@ -268,7 +270,7 @@ View logs:
 tail -f game.log
 ```
 
-## Troubleshooting
+## Troubleshooting - ADJUST 
 
 **Robot not connecting:**
 - Check USB cable and port in `config.yaml`
@@ -278,7 +280,7 @@ tail -f game.log
 **Arduino not responding:**
 - Check USB cable and port in `config.yaml`
 - Open Arduino Serial Monitor and send test commands manually
-- Verify baud rate matches (9600)
+- Verify baud rate matches (115200)
 
 **Drop detection not working:**
 - Check sensor wiring to Arduino analog pins
@@ -292,7 +294,6 @@ tail -f game.log
 
 **AI too slow/too fast:**
 - Adjust `ai_depth` in `config.yaml` (lower = faster, higher = smarter)
-- Typical range: 3-6 (4 is balanced)
 
 ## Serial Protocol
 
@@ -356,12 +357,3 @@ See `docs/serial_protocol.md` for complete specification.
 - Robot arm: Elephant Robotics MyCobot 280
 - AI algorithm: Minimax with alpha-beta pruning
 
-## Contact
-
-[Add contact information]
-
----
-
-**Project Status:** 🚧 In Development
-
-See [Project Milestones](docs/milestones.md) for current progress.

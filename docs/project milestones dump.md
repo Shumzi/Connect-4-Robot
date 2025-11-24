@@ -361,7 +361,7 @@
 
 **Issue 8.1: Update Documentation**
 
-- \[ \] Update [README.md](http://README.md) with setup instructions
+- \[ \] Update [README.md](http://README.md) with setup instructions + troubleshooting
 - \[ \] Create docs/setup_guide.md for first-time setup
 - \[ \] Document calibration procedure
 - \[ \] Document troubleshooting common issues
