@@ -1,6 +1,6 @@
 # Connect 4 Robot
 
-A robotic Connect 4 game where a MyCobot 280 robot arm plays against a human player. The system uses computer vision-free drop detection via LED strip sensors, automated puck dispensing with solenoids, and AI-powered gameplay.
+A robotic Connect 4 game where a MyCobot 280 robot arm plays against a human player. The system uses drop detection via LED strip sensors, automated puck dispensing with solenoids, and AI-powered gameplay.
 
 ## System Overview
 
