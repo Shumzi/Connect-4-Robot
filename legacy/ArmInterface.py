@@ -3,10 +3,11 @@ from pymycobot import MyCobot
 from pymycobot.genre import Coord
 from typing import *
 import logging
-from core.logger import get_logger
+# from core.logger import get_logger
+from logging import getLogger as get_logger
 from pymycobot import MyCobotSocket
 
-logger = get_logger(__name__, filepath="logs/robot.log")
+logger = get_logger(__name__)
 
 class ArmInterface:
     def __init__(self, port: str, baudrate: int):
@@ -70,7 +71,7 @@ class ArmInterface:
         self.chess_table[1] = [-180, 90, self.ENTRY_PLANE, 0.11, 0.34, -91.23]
         self.chess_table[0] = [-180, 143, self.ENTRY_PLANE, 0.11, 0.34, -91.23]
         
-                # Define drop table for different positions
+        # Define drop table for different positions
         self.drop_table = [None for _ in range(7)]
         self.drop_table[6] = [-184.5, -149, self.BOARD_PLANE-3, 0.11, 0.34, -91.23]
         self.drop_table[5] = [-183, -100, self.BOARD_PLANE, 0.11, 0.34, -91.23]
@@ -148,25 +149,13 @@ class ArmInterface:
     def off_all_outputs(self):
         self.drive_output(0x00)
 
-    #  on_all_soleloids and update current state
-    def on_all_soleloids(self):
-        for j in range(self.NUMBER_OF_SOLENOIDS):
-            self.on_current_state_bit(j)
-        self.drive_output(self.current_state)
-
-    #  off_all_soleloids and update current state
-    def on_all_soleloids(self):
-        for j in range(self.NUMBER_OF_SOLENOIDS):
-            self.off_current_state_bit(j)
-        self.drive_output(self.current_state)
-
     #  on_switch_led and update current state
     def on_switch_led(self):
         self.on_current_state_bit(self.LED_SWITCH)
         self.drive_output(self.current_state)
 
     #  off_switch_led and update current state
-    def on_switch_led(self):
+    def off_switch_led(self):
         self.off_current_state_bit(self.LED_SWITCH)
         self.drive_output(self.current_state)
 
@@ -223,7 +212,6 @@ class ArmInterface:
     def recovery(self):
         self.send_angles(self.angle_table["recovery"], self.ARM_SPEED)
 
-
     # Method to move to the top of the left discs stack
     def hover_over_stack_left(self):
         self.send_coords(self.angle_table["stack-hover-L"], self.ARM_SPEED_PRECISE, 1)
@@ -242,23 +230,23 @@ class ArmInterface:
 
     # Method to pick up a disk form stakc level n with thickness t
     def get_disc_yellow(self, counter: int,thickness: int):
-	    self.temp_target_coords = self.angle_table["stack-hover-R"] 
-	    self.disc_x_coord=self.DISC_LEVEL+(counter*thickness)
-	    self.temp_target_coords[0]=self.disc_x_coord
-	    self.send_coords(self.temp_target_coords, self.ARM_SPEED, 1)
-	    self.pump_on()
-	    self.send_coords(self.angle_table["stack-apro-R"], self.ARM_SPEED,1)  
-	    #self.send_coord(Coord.X.value,self.STACK_ENTRY,self.ARM_SPEED_PRECISE)
+        self.temp_target_coords = self.angle_table["stack-hover-R"] 
+        self.disc_x_coord=self.DISC_LEVEL+(counter*thickness)
+        self.temp_target_coords[0]=self.disc_x_coord
+        self.send_coords(self.temp_target_coords, self.ARM_SPEED, 1)
+        self.pump_on()
+        self.send_coords(self.angle_table["stack-apro-R"], self.ARM_SPEED,1)  
+        #self.send_coord(Coord.X.value,self.STACK_ENTRY,self.ARM_SPEED_PRECISE)
 	    
     # Method to pick up a disk form stack level n with thickness t
     def get_disc_red(self, counter: int,thickness: int):
-	    self.temp_target_coords = self.angle_table["stack-hover-L"] 
-	    self.disc_x_coord=self.DISC_LEVEL+(counter*thickness)
-	    self.temp_target_coords[0]=self.disc_x_coord
-	    self.send_coords(self.temp_target_coords, self.ARM_SPEED, 1)
-	    self.pump_on()
-	    self.send_coords(self.angle_table["stack-apro-L"], self.ARM_SPEED,1)
-	    #self.send_coord(Coord.X.value,self.STACK_ENTRY,self.ARM_SPEED_PRECISE)
+        self.temp_target_coords = self.angle_table["stack-hover-L"] 
+        self.disc_x_coord=self.DISC_LEVEL+(counter*thickness)
+        self.temp_target_coords[0]=self.disc_x_coord
+        self.send_coords(self.temp_target_coords, self.ARM_SPEED, 1)
+        self.pump_on()
+        self.send_coords(self.angle_table["stack-apro-L"], self.ARM_SPEED,1)
+        #self.send_coord(Coord.X.value,self.STACK_ENTRY,self.ARM_SPEED_PRECISE)
                     
     # Method to move to the handover window and drop the disk
     def drop_in_window(self):

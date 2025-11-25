@@ -1,51 +1,27 @@
 import numpy as np
 from typing import Tuple
-from core.logger import get_logger
+# from core.logger import get_logger
 
 
 class Board:
-    # Constants for display
-    DISPLAY_EMPTY = "O"
-    DISPLAY_R = "R"
-    DISPLAY_Y = "Y"
-
     # Constants for grid representation
     P_EMPTY = 0
     P_RED = 1
     P_YELLOW = 2
 
+    # Constants for display
+    value_to_symbol = {P_EMPTY: "O", P_RED: "R", P_YELLOW: "Y"}
+
     def __init__(self):
         # Initialize board dimensions
         self.width = 7
         self.height = 6
-        # Initialize empty grid
-        self.grid = [
-            [Board.P_EMPTY for j in range(self.height)] for i in range(self.width)
-        ]
-        # Initialize grids for red and yellow players
-        self.grid_red = np.array(
-            [[Board.P_EMPTY for j in range(self.height)] for i in range(self.width)],
-            dtype=np.int8,
-        )
-        self.grid_yellow = np.array(
-            [[Board.P_EMPTY for j in range(self.height)] for i in range(self.width)],
-            dtype=np.int8,
-        )
+        self.grid = np.full((self.height, self.width), Board.P_EMPTY, dtype=np.int8)
+
         # Initialize game status
         self.done = False
         self.winner = None
-        self.valid = True
-        self.last_drop_pos: Tuple[int, int] = None
-        self.last_drop_color = None
-        self.logger = get_logger(__name__)
-
-    @classmethod
-    def opponent(cls, player):
-        # Return the opponent of the current player
-        if player == Board.P_RED:
-            return Board.P_YELLOW
-        elif player == Board.P_YELLOW:
-            return Board.P_RED
+        # self.logger = get_logger(__name__)
 
     def reset(self):
         # Reset the board to its initial state
@@ -55,49 +31,35 @@ class Board:
         """
         Display the board in text format
         """
-        for y in range(6):
-            for x in range(7):
-                cell = self.grid[x][y]
-                if cell == Board.P_RED:
-                    print(Board.DISPLAY_R, end="")
-                elif cell == Board.P_YELLOW:
-                    print(Board.DISPLAY_Y, end="")
-                else:
-                    print(Board.DISPLAY_EMPTY, end="")
+        for row in self.grid[::-1]:
+            for cell in row:
+                print(Board.value_to_symbol[cell], end=" ")
             print()
         print()
-
-    def propagate_relative_grid(self):
-        """
-        Update the relative grids for red and yellow players based on the main grid
-        The relative grid is defined such that the current player is always player 1 and the opponent is always player 2
-        This is because the neural network only recognizes the current player as player 1
-        """
-        self.grid_red = np.array(self.grid)
-        self.grid_yellow = np.array(self.grid)
-        for x in range(self.width):
-            for y in range(self.height):
-                if self.grid_yellow[x][y] == Board.P_RED:
-                    self.grid_yellow[x][y] = Board.P_YELLOW
-                elif self.grid_yellow[x][y] == Board.P_YELLOW:
-                    self.grid_yellow[x][y] = Board.P_RED
 
     def update_win_status(self):
         """
         Check if either player has won and update the game status accordingly
         """
-        if self.check_player_x_win(self.P_RED):
+        if self.is_player_winner(self.P_RED):
             self.done = True
             self.winner = self.P_RED
-        elif self.check_player_x_win(self.P_YELLOW):
+        elif self.is_player_winner(self.P_YELLOW):
             self.done = True
             self.winner = self.P_YELLOW
+        elif len(self.available_actions()) == 0:
+            self.done = True  # Draw
+
+    def is_draw(self):
+        """
+        Check if the game is a draw
+        """
+        return len(self.available_actions()) == 0 and self.winner is None
 
     def update(self):
         """
         Update the relative grids and the game status
         """
-        self.propagate_relative_grid()
         self.update_win_status()
 
     def _check_symbol(self, player):
@@ -115,8 +77,8 @@ class Board:
         Check for a vertical win condition
         """
         check = self._check_symbol(player)
-        for j in range(self.height):
-            if check in np.array_str(board_state[:, j]):
+        for col in range(self.width):
+            if check in np.array_str(board_state[:, col]):
                 return True
         return False
 
@@ -125,132 +87,77 @@ class Board:
         Check for a horizontal win condition
         """
         check = self._check_symbol(player)
-        for i in range(self.width):
-            if check in np.array_str(board_state[i, :]):
+        for row in range(self.height):
+            if check in np.array_str(board_state[row, :]):
                 return True
         return False
 
-    def _check_leading_diag(self, board_state, player):
+    def _check_leading_diag(self, board_state: np.ndarray, player):
         """
         Check for a win condition in the leading diagonals
         """
         check = self._check_symbol(player)
-        for k in range(0, self.width - 4 + 1):
-            left_diagonal = np.array(
-                [
-                    board_state[k + d, d]
-                    for d in range(min(self.width - k, min(self.width, self.height)))
-                ]
-            )
-            right_diagonal = np.array(
-                [
-                    board_state[d + k, self.height - d - 1]
-                    for d in range(min(self.width - k, min(self.width, self.height)))
-                ]
-            )
-            if check in np.array_str(left_diagonal) or check in np.array_str(
-                right_diagonal
-            ):
+        for k in range(- self.height + 4, self.width - 3):
+            if check in np.array_str(board_state.diagonal(k)):
                 return True
         return False
 
-    def _check_counter_diag(self, board_state, player):
+    def _check_counter_diag(self, board_state: np.ndarray, player):
         """
         Check for a win condition in the counter diagonals
         """
-        check = self._check_symbol(player)
-        for k in range(1, self.height - 4 + 1):
-            left_diagonal = np.array(
-                [
-                    board_state[d, d + k]
-                    for d in range(min(self.height - k, min(self.width, self.height)))
-                ]
-            )
-            right_diagonal = np.array(
-                [
-                    board_state[d, self.height - 1 - k - d]
-                    for d in range(min(self.height - k, min(self.width, self.height)))
-                ]
-            )
-            if check in np.array_str(left_diagonal) or check in np.array_str(
-                right_diagonal
-            ):
-                return True
-        return False
+        board_state_flipped = np.fliplr(board_state)
+        return self._check_leading_diag(board_state_flipped, player)
 
-    def check_player_x_win(self, player):
+    def is_player_winner(self, player):
         """
         Check if the given player has won
         """
         board_state = np.array(self.grid)
-        if self._check_vertical_win(board_state, player):
-            return True
-        elif self._check_horizontal_win(board_state, player):
-            return True
-        elif self._check_leading_diag(board_state, player):
-            return True
-        elif self._check_counter_diag(board_state, player):
-            return True
-        return False
+        return any([
+            self._check_vertical_win(board_state, player),
+            self._check_horizontal_win(board_state, player),
+            self._check_leading_diag(board_state, player),
+            self._check_counter_diag(board_state, player)
+        ])
 
     def available_actions(self):
         """
         Return a list of available actions (columns where a piece can be dropped)
         """
         actions = []
-        for x in range(self.width):
-            if self.grid[x][0] == Board.P_EMPTY:
-                actions.append(x)
+        for col in range(self.width):
+            if self.grid[-1][col] == Board.P_EMPTY:
+                actions.append(col)
         return actions
 
-    def is_n_valid(self, x: int):
+    def is_col_valid(self, col: int):
         """
         Check if a piece can be dropped in the given column
         """
-        if self.grid[x][0] == Board.P_EMPTY:
+        if self.grid[-1][col] == Board.P_EMPTY:
             return True
         else:
             return False
 
-    def available_cell_y(self, n: int) -> int:
+    def available_cell(self, col: int) -> int:
         """
-        Return the y-coordinate of the available cell in the given column
+        Return the row# of the available cell in the given column
         """
-        for y in range(self.height):
-            if self.grid[n][y] != Board.P_EMPTY:
-                return y - 1
-        return self.height - 1
+        for row_num, cell in enumerate(self.grid[:, col]):
+            if cell == Board.P_EMPTY:
+                return row_num
+        return -1
 
-    @classmethod
-    def grid_diff(cls, grid1, grid2):
-        res = []
-        for i in range(7):
-            for j in range(6):
-                if grid1[i][j] != grid2[i][j]:
-                    res.append(((i, j), grid1[i][j], grid2[i][j]))
-        return res
-
-    def reset_last_state(self):
-        self.last_drop_color = None
-        self.last_drop_pos = None
-
-    def drop_piece(self, x, player):
+    def drop_piece(self, col, player):
         """
         Drop a piece of the given player in the given column
         """
-        if self.is_n_valid(x):
-            y = self.available_cell_y(x)
-            self.last_drop_pos = (x, y)
-            self.last_drop_color = player
-            self.grid[x][y] = player
-            if player == Board.P_RED:
-                self.grid_red[x][y] = self.P_RED
-                self.grid_yellow[x][y] = self.P_YELLOW
-            else:
-                self.grid_red[x][y] = self.P_YELLOW
-                self.grid_yellow[x][y] = self.P_RED
+        if self.is_col_valid(col):
+            row = self.available_cell(col)
+            self.grid[row][col] = player
         else:
-            raise Exception(f"Not valid move. Column {x} is full.")
+            raise Exception(f"Not valid move. Column {col} is full.")
 
     def check_board_state_valid(self):
         count_red = 0
@@ -276,7 +183,7 @@ class Board:
         else:
             return True
 
-    def should_have_pieces(round) -> Tuple[int, int]:
+    def should_have_pieces(self, round: int) -> Tuple[int, int]:
         """Return how many red & yellow pieces should the board have when in round x
 
         Args:
