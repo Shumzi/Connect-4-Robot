@@ -129,6 +129,7 @@
 **Issue 3.4: Implement Main Entry Point**
 
 - \[ \] Create main.py
+- [ ] create config.yaml for entry + robot etc.
 - \[ \] Load configuration from config.yaml
 - \[ \] Create hardware objects based on simulation flags
 - \[ \] Wire up callbacks between arduino and game
