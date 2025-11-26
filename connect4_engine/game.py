@@ -3,7 +3,7 @@ from core.board import Board
 from core.ai import AIPlayerDummy
 from hardware.robot import IRobot
 from hardware.arduino import IArduino
-from logger import logger
+from connect4_engine.utils.logger import logger
 class Connect4Game:
 
     PLAYER_COLOR = Board.P_RED
@@ -16,6 +16,7 @@ class Connect4Game:
         self.ai = AIPlayerDummy()
         self.robot = robot
         self.arduino = arduino
+        self.logger = logger
         self.arduino.set_on_puck_dropped_callback(self.piece_dropped_in_board)
         self.turn = 'ai'
 
@@ -30,7 +31,7 @@ class Connect4Game:
         """
         Handle game over scenario
         """
-        logger.info(message)
+        self.logger.info(message)
         self.board.display()
         self.arduino.reset()
         self.robot.reset()
@@ -44,11 +45,13 @@ class Connect4Game:
         """
         if self.turn == 'ai':
             self.board.drop_piece(column, Connect4Game.AI_COLOR)
+            self.logger.info(f"AI dropped piece in column {column}")
             if self.check_winner():
                 return
             self.turn = 'player'
         else:
             self.board.drop_piece(column, Connect4Game.PLAYER_COLOR)
+            self.logger.info(f"Player dropped piece in column {column}")
             if self.check_winner():
                 return
             self.turn = 'ai'

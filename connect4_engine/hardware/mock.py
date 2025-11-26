@@ -1,7 +1,7 @@
 from typing import Callable, Optional
 from .arduino import IArduino
 from .robot import IRobot
-from logger import logger
+from connect4_engine.utils.logger import logger
 
 class ArduinoDummy(IArduino):
     def __init__(self):
@@ -66,3 +66,37 @@ class RobotDummy(IRobot):
         Simulate resetting the robot hardware.
         """
         logger.warning("Robot resetting to home position...")
+
+
+class RobotDummySerial(IRobot):
+    def __init__(self, ser):
+        self.ser = ser
+    def drop_piece(self, column: int):
+        """
+        Simulate dropping a piece in the specified column using the robot hardware.
+        """
+        logger.warning(f"Robot dropping piece in column {column}")
+        logger.warning(f"""    go to robot puck pile
+    turn on pump
+    move to column {column}
+    turn off pump
+    return to home position""")
+        self.ser.push_line(f"DROP {column}\n")
+
+    def give_player_puck(self):
+        """
+        Simulate giving a puck to the player.
+        """
+        logger.warning("""Robot giving puck to player
+    go to player puck pile
+    turn on pump
+    move to player pickup location
+    turn off pump
+    return to home position""")
+        
+    def reset(self):
+        """
+        Simulate resetting the robot hardware.
+        """
+        logger.warning("Robot resetting to home position...")
+

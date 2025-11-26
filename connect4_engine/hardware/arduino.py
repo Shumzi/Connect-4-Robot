@@ -15,12 +15,13 @@ class IArduino(ABC):
         pass
 
 class ArduinoCommunicator(IArduino):
-    def __init__(self, port, baudrate, on_puck_dropped, on_game_over, logger):
-        self._ser = serial.Serial(port, baudrate, timeout=1)
-        self._on_puck_dropped = on_puck_dropped
-        self._on_game_over = on_game_over   # if you want Arduino notified on game over
+    def __init__(self, ser, logger):
+        self._ser = ser
         self._logger = logger
         self._accept_moves = False          # only accept drops when game is active
+
+    def set_on_puck_dropped_callback(self, callback: Callable[[int], None]):
+        self._on_puck_dropped = callback
 
     def read_loop(self):
         self._logger.info("Arduino read loop started")
@@ -33,10 +34,6 @@ class ArduinoCommunicator(IArduino):
 
     def _handle_line(self, line: str):
         parts = line.split()
-
-        # Example protocol:
-        #   START
-        #   DROP <col>
 
         if parts[0] == "START":
             self.handle_start()
