@@ -8,7 +8,7 @@
 
 **Issues**
 
-**Issue 1.1: Create Project Structure**
+Issue 1.1: Create Project Structure
 
 - \[ \] Create all directories as per architecture design
 - \[ \] Initialize git repository
@@ -17,7 +17,7 @@
 
 **Deliverable:** Empty but organized folder structure
 
-**Issue 1.2: Extract Game Logic from Old Repo**
+Issue 1.2: Extract Game Logic from Old Repo
 
 - \[ \] Copy board.py logic (board state representation, move validation)
 - \[ \] Copy ai.py logic (minimax algorithm, evaluation function)
@@ -27,7 +27,7 @@
 
 **Deliverable:** Working core/board.py and core/ai.py with unit tests
 
-**Issue 1.3: Copy Legacy Robot Code**
+Issue 1.3: Copy Legacy Robot Code
 
 - \[ \] Copy ArmInterface.py to legacy/ folder
 - \[ \] Document what pymycobot version it uses
@@ -36,7 +36,7 @@
 
 **Deliverable:** Working legacy robot code as reference
 
-**Issue 1.4: Create requirements.txt and config.yaml**
+Issue 1.4: Create requirements.txt and config.yaml
 
 - \[ \] Pin pymycobot version (3.6.3 or working version)
 - \[ \] Add pyserial, pyyaml dependencies
@@ -53,7 +53,7 @@
 
 **Issues**
 
-**Issue 2.1: Implement Mock Arduino**
+Issue 2.1: Implement Mock Arduino
 
 - \[ \] Create hw/mock.py with MockArduino class
 - \[ \] Implement connect(), send_command(), register_callback()
@@ -62,7 +62,7 @@
 
 **Deliverable:** Functioning MockArduino that simulates serial communication
 
-**Issue 2.2: Implement Mock Robot**
+Issue 2.2: Implement Mock Robot
 
 - \[ \] Create MockRobot class in hw/mock.py
 - \[ \] Implement connect(), place_puck_at_column(), give_player_puck()
@@ -71,7 +71,7 @@
 
 **Deliverable:** Functioning MockRobot that simulates arm movements
 
-**Issue 2.3: Create Test Game Flow Script**
+Issue 2.3: Create Test Game Flow Script
 
 - \[ \] Create simulation/test_game_flow.py
 - \[ \] Script initializes game with mock hardware
@@ -89,7 +89,7 @@
 
 **Issues**
 
-**Issue 3.1: Implement Board Class**
+Issue 3.1: Implement Board Class
 
 - \[ \] Create core/board.py with Board class
 - \[ \] Implement drop_piece(column, player) method
@@ -101,7 +101,7 @@
 
 **Deliverable:** Fully tested Board class
 
-**Issue 3.2: Implement AI Engine**
+Issue 3.2: Implement AI Engine
 
 - \[ \] Create core/ai.py with AIEngine class
 - \[ \] Implement get_best_move(state, player) using minimax
@@ -113,7 +113,7 @@
 
 **Deliverable:** Functioning AI that plays competently
 
-**Issue 3.3: Implement Game Controller**
+Issue 3.3: Implement Game Controller
 
 - \[ \] Create game.py with Connect4Game class
 - \[ \] Implement \__init__ (takes robot, arduino, config)
@@ -126,7 +126,7 @@
 
 **Deliverable:** Complete game orchestration logic tested with mocks
 
-**Issue 3.4: Implement Main Entry Point**
+Issue 3.4: Implement Main Entry Point
 
 - \[ \] Create main.py
 - [ ] create config.yaml for entry + robot etc.
@@ -138,7 +138,7 @@
 
 **Deliverable:** Runnable [main.py](http://main.py) that plays full game with mocks
 
-**Issue 3.5: Add Logging System**
+Issue 3.5: Add Logging System
 
 - \[ \] Create utils/logger.py with setup function
 - \[ \] Add logging to [game.py](http://game.py) (player moves, robot moves, wins)
@@ -156,7 +156,7 @@
 
 **Issues**
 
-**Issue 4.1: Define Serial Protocol**
+Issue 4.1: Define Serial Protocol
 
 - \[ \] Document command format (PC → Arduino)
 - \[ \] Document response format (Arduino → PC)
@@ -165,7 +165,7 @@
 
 **Deliverable:** Complete protocol specification document
 
-**Issue 4.2: Implement Arduino Interface**
+Issue 4.2: Implement Arduino Interface
 
 - \[ \] Create hw/arduino.py with ArduinoInterface class
 - \[ \] Implement serial connection management
@@ -177,7 +177,7 @@
 
 **Deliverable:** Working ArduinoInterface that communicates over serial
 
-**Issue 4.3: Test Arduino Interface with Mock Serial**
+Issue 4.3: Test Arduino Interface with Mock Serial
 
 - \[ \] Create mock serial port for testing
 - \[ \] Test all command types are sent correctly
@@ -194,7 +194,7 @@
 
 **Issues**
 
-**Issue 5.1: Wrap Legacy Robot Code**
+Issue 5.1: Wrap Legacy Robot Code
 
 - \[ \] Create hw/robot.py with RobotController class
 - \[ \] Wrap legacy ArmInterface in clean API
@@ -206,7 +206,7 @@
 
 **Deliverable:** Clean robot interface wrapping legacy code
 
-**Issue 5.2: Create Calibration Script**
+Issue 5.2: Create Calibration Script
 
 - \[ \] Create scripts/calibrate_robot.py
 - \[ \] Interactive prompts to move arm to each position
@@ -216,7 +216,7 @@
 
 **Deliverable:** Calibration tool and saved positions file
 
-**Issue 5.3: Test Robot Movements**
+Issue 5.3: Test Robot Movements
 
 - \[ \] Test connection to real robot arm
 - \[ \] Test pick puck from red holder
@@ -235,7 +235,7 @@
 
 **Issues**
 
-**Issue 6.1: Get PCB Pin Mappings**
+Issue 6.1: Get PCB Pin Mappings
 
 - \[ \] Contact PCB designer for exact pin assignments
 - \[ \] Document pins for LED strip, solenoids, sensors
@@ -243,7 +243,7 @@
 
 **Deliverable:** Documented pin mappings
 
-**Issue 6.2: Implement Arduino Main Sketch**
+Issue 6.2: Implement Arduino Main Sketch
 
 - \[ \] Create arduino_main.ino with main loop
 - \[ \] Implement serial command parser
@@ -252,7 +252,7 @@
 
 **Deliverable:** Basic Arduino sketch with serial communication
 
-**Issue 6.3: Implement LED Control**
+Issue 6.3: Implement LED Control
 
 - \[ \] Create led_control.h/cpp
 - \[ \] Initialize LED strip (FastLED or Adafruit_NeoPixel)
@@ -262,7 +262,7 @@
 
 **Deliverable:** Working LED control via serial commands
 
-**Issue 6.4: Implement Solenoid Control**
+Issue 6.4: Implement Solenoid Control
 
 - \[ \] Create solenoid_control.h/cpp
 - \[ \] Initialize solenoid pins (via relay/MOSFET drivers)
@@ -272,7 +272,7 @@
 
 **Deliverable:** Working solenoid control via serial commands
 
-**Issue 6.5: Implement Sensor Reading**
+Issue 6.5: Implement Sensor Reading
 
 - \[ \] Create sensor_handler.h/cpp
 - \[ \] Initialize sensor pins (photoresistors)
@@ -282,7 +282,7 @@
 
 **Deliverable:** Working drop detection with event reporting
 
-**Issue 6.6: Integrate and Test Arduino Firmware**
+Issue 6.6: Integrate and Test Arduino Firmware
 
 - \[ \] Test all components together
 - \[ \] Test reset game command
@@ -299,7 +299,7 @@
 
 **Issues**
 
-**Issue 7.1: Test PC ↔ Arduino Communication**
+Issue 7.1: Test PC ↔ Arduino Communication
 
 - \[ \] Connect Arduino to PC via USB
 - \[ \] Test all command types work
@@ -309,7 +309,7 @@
 
 **Deliverable:** Verified bidirectional communication
 
-**Issue 7.2: Test PC ↔ Robot Communication**
+Issue 7.2: Test PC ↔ Robot Communication
 
 - \[ \] Connect robot to PC via USB
 - \[ \] Test all movement commands work
@@ -319,7 +319,7 @@
 
 **Deliverable:** Verified robot control from PC
 
-**Issue 7.3: Integration Test - Single Turn**
+Issue 7.3: Integration Test - Single Turn
 
 - \[ \] Place puck in player position
 - \[ \] Player drops puck
@@ -332,7 +332,7 @@
 
 **Deliverable:** One complete turn working end-to-end
 
-**Issue 7.4: Integration Test - Full Game**
+Issue 7.4: Integration Test - Full Game
 
 - \[ \] Play complete game to win condition
 - \[ \] Verify win detection works
@@ -342,7 +342,7 @@
 
 **Deliverable:** Full game playable from start to finish
 
-**Issue 7.5: Performance & Reliability Testing**
+Issue 7.5: Performance & Reliability Testing
 
 - \[ \] Play 10+ games and track failures
 - \[ \] Measure average turn time (player wait)
@@ -352,7 +352,7 @@
 
 **Deliverable:** Stable, reliable system
 
-**Milestone 8: Polish & Documentation**
+Milestone 8: Polish & Documentation
 
 **Goal:** Final polish, documentation, and deployment  
 **Duration:** 2-3 days  
@@ -360,7 +360,7 @@
 
 **Issues**
 
-**Issue 8.1: Update Documentation**
+Issue 8.1: Update Documentation
 
 - \[ \] Update [README.md](http://README.md) with setup instructions + troubleshooting
 - \[ \] Create docs/setup_guide.md for first-time setup
@@ -370,7 +370,7 @@
 
 **Deliverable:** Complete user documentation
 
-**Issue 8.2: Code Cleanup**
+Issue 8.2: Code Cleanup
 
 - \[ \] Remove debug print statements
 - \[ \] Add docstrings to all classes/methods
@@ -380,7 +380,7 @@
 
 **Deliverable:** Clean, professional codebase
 
-**Issue 8.3: Create Demo Video**
+Issue 8.3: Create Demo Video
 
 - \[ \] Record full game playthrough
 - \[ \] Show robot movements
@@ -390,7 +390,7 @@
 
 **Deliverable:** Demo video for presentation
 
-**Issue 8.4: Final Testing & Handoff**
+Issue 8.4: Final Testing & Handoff
 
 - \[ \] Test complete setup from scratch (fresh install)
 - \[ \] Verify all documentation is accurate
