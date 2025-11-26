@@ -37,30 +37,11 @@ class Board:
             print()
         print()
 
-    def update_win_status(self):
-        """
-        Check if either player has won and update the game status accordingly
-        """
-        if self.is_player_winner(self.P_RED):
-            self.done = True
-            self.winner = self.P_RED
-        elif self.is_player_winner(self.P_YELLOW):
-            self.done = True
-            self.winner = self.P_YELLOW
-        elif len(self.available_actions()) == 0:
-            self.done = True  # Draw
-
     def is_draw(self):
         """
         Check if the game is a draw
         """
         return len(self.available_actions()) == 0 and self.winner is None
-
-    def update(self):
-        """
-        Update the relative grids and the game status
-        """
-        self.update_win_status()
 
     def _check_symbol(self, player):
         """
@@ -125,11 +106,7 @@ class Board:
         """
         Return a list of available actions (columns where a piece can be dropped)
         """
-        actions = []
-        for col in range(self.width):
-            if self.grid[-1][col] == Board.P_EMPTY:
-                actions.append(col)
-        return actions
+        return [col for col in range(self.width) if self.is_col_valid(col)]
 
     def is_col_valid(self, col: int):
         """
