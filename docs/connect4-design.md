@@ -107,3 +107,7 @@ connect4-robot/
 - Pure event-driven flow is safe due to physical constraints (robot gives puck to user)
 - Use phase variable just for debugging/logging clarity; FSM not required unless system becomes more complex
 - Mocks will keep development smooth when hardware unavailable
+
+## Gotchas
+- code is currently blocking from the arduino reading loop. would be better if we could just pop'em and lock'em, also tests would be nicer that way, but what'r'ya gonnado.
+- didn't implement error handling, assume you can't put in a puck before pressing the start button, etc.

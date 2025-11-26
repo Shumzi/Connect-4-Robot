@@ -2,15 +2,9 @@ import os
 import sys
 import pytest
 
-# Ensure imports behave the same way as running from inside the `connect4_engine` folder
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-PKG_DIR = os.path.join(ROOT, "connect4_engine")
-if PKG_DIR not in sys.path:
-    sys.path.insert(0, PKG_DIR)
-
-from game import Connect4Game
-from hardware.mock import ArduinoDummy, RobotDummy
-from core.board import Board
+from connect4_engine.game import Connect4Game
+from connect4_engine.hardware.mock import ArduinoDummy, RobotDummy
+from connect4_engine.core.board import Board
 
 
 def test_player_vertical_win_via_arduino(monkeypatch):

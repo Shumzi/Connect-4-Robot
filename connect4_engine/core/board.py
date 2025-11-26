@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Tuple
-from logger import logger
+from connect4_engine.utils.logger import logger
 
 
 class Board:
