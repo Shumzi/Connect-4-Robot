@@ -1,16 +1,17 @@
 from typing import Callable, Optional
 from .arduino import IArduino
 from .robot import IRobot
+from logger import logger
 
 class ArduinoDummy(IArduino):
     def __init__(self):
-        self.on_player_moved_callback: Optional[Callable[[int], None]] = None
+        self.on_puck_dropped_callback: Optional[Callable[[int], None]] = None
 
-    def set_on_player_moved_callback(self, callback: Callable[[int], None]):
+    def set_on_puck_dropped_callback(self, callback: Callable[[int], None]):
         """
         Set the callback function to be called when a player move is detected.
         """
-        self.on_player_moved_callback = callback
+        self.on_puck_dropped_callback = callback
 
     def puck_dropped_in_col(self, column: int):
         """
@@ -18,20 +19,20 @@ class ArduinoDummy(IArduino):
         in this case we just tell it which column to simulate a move for.
         actual implementation would involve serial communication and waiting for input from the Arduino.
         """
-        print("Arduino listening for player moves...")
+        logger.warning("Arduino listening for player moves...")
         # Simulate a player move for demonstration purposes
         simulated_player_move = column
-        print(f"Simulated player move detected in column {simulated_player_move}")
-        if self.on_player_moved_callback is None:
+        logger.warning(f"Simulated player move detected in column {simulated_player_move}")
+        if self.on_puck_dropped_callback is None:
             # Contract violated: someone forgot to register the callback
-            raise RuntimeError("on_player_moved callback not set; call set_on_player_moved() first")
-        self.on_player_moved_callback(simulated_player_move)
+            raise RuntimeError("on_puck_dropped callback not set; call set_on_puck_dropped() first")
+        self.on_puck_dropped_callback(simulated_player_move)
 
     def reset(self):
         """
         Simulate resetting the Arduino hardware.
         """
-        print("Arduino resetting solenoids...")
+        logger.warning("Arduino resetting solenoids...")
 
 class RobotDummy(IRobot):
     def __init__(self, arduino: ArduinoDummy):
@@ -41,8 +42,8 @@ class RobotDummy(IRobot):
         """
         Simulate dropping a piece in the specified column using the robot hardware.
         """
-        print(f"Robot dropping piece in column {column}")
-        print(f"""    go to robot puck pile
+        logger.warning(f"Robot dropping piece in column {column}")
+        logger.warning(f"""    go to robot puck pile
     turn on pump
     move to column {column}
     turn off pump
@@ -53,7 +54,7 @@ class RobotDummy(IRobot):
         """
         Simulate giving a puck to the player.
         """
-        print("""Robot giving puck to player
+        logger.warning("""Robot giving puck to player
     go to player puck pile
     turn on pump
     move to player pickup location
@@ -64,4 +65,4 @@ class RobotDummy(IRobot):
         """
         Simulate resetting the robot hardware.
         """
-        print("Robot resetting to home position...")
+        logger.warning("Robot resetting to home position...")

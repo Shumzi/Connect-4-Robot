@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Tuple
-# from core.logger import get_logger
+from logger import logger
 
 
 class Board:
@@ -31,11 +31,13 @@ class Board:
         """
         Display the board in text format
         """
+        lines = []
         for row in self.grid[::-1]:
-            for cell in row:
-                print(Board.value_to_symbol[cell], end=" ")
-            print()
-        print()
+            line = " ".join(Board.value_to_symbol[cell] for cell in row)
+            lines.append(line)
+
+        board_str = "\n" + "\n".join(lines) + "\n"  # final extra newline if you want
+        logger.info(board_str)
 
     def is_draw(self):
         """

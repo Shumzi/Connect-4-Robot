@@ -3,21 +3,20 @@ from core.board import Board
 from core.ai import AIPlayerDummy
 from hardware.robot import IRobot
 from hardware.arduino import IArduino
+from logger import logger
 class Connect4Game:
 
     PLAYER_COLOR = Board.P_RED
     AI_COLOR = Board.P_YELLOW
-
     def __init__(self,
                  arduino: IArduino,
                  robot: IRobot,
                  player_starts: bool = False):
-        
         self.board = Board()
         self.ai = AIPlayerDummy()
         self.robot = robot
         self.arduino = arduino
-        self.arduino.set_on_player_moved_callback(self.piece_dropped_in_board)
+        self.arduino.set_on_puck_dropped_callback(self.piece_dropped_in_board)
         self.turn = 'ai'
 
         # possibly setup robot and arduino if not done elsewhere
@@ -31,7 +30,7 @@ class Connect4Game:
         """
         Handle game over scenario
         """
-        print(message)
+        logger.info(message)
         self.board.display()
         self.arduino.reset()
         self.robot.reset()

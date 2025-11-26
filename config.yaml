@@ -1,0 +1,5 @@
+logging:
+  level: DEBUG
+  output: FILE # Options: STDOUT, FILE, BOTH
+  logfile: game.log
+  overwrite: true
