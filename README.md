@@ -122,6 +122,23 @@ connect4-robot/
 - **Classes**: `MockArduino`, `MockRobot`
 - **Usage**: Set `simulation: true` in `config.yaml`
 
+## Risk Mitigation
+
+**High Risk Items:**
+
+- **Arduino firmware bugs** - Mitigated by early mock testing
+- **Robot calibration drift** - Mitigated by calibration script
+- **Serial communication reliability** - Mitigated by error handling
+- **Hardware availability** - Mitigated by simulation layer
+
+**Recommended approach:**
+
+- Build simulation layer FIRST (M2) before hardware
+- Test each component in isolation before integration
+- Keep legacy code as fallback
+- Log everything for debugging
+
+
 ## Setup
 
 ### Prerequisites
