@@ -1,0 +1,5 @@
+logging:
+  level: DEBUG # Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  output: STDOUT # Options: STDOUT, FILE, BOTH
+  logfile: game.log
+  overwrite: true
