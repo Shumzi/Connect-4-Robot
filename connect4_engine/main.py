@@ -8,11 +8,10 @@ class Main:
         self.game = Connect4Game(arduino=self.arduino, robot=self.robot, player_starts=True)
     
     def play(self):
+        
+        # self.arduino.read_loop()- in real hardware this would be the only thing running.
         # Example moves
-        self.arduino.puck_dropped_in_col(3)
-        self.arduino.puck_dropped_in_col(3)
-        self.arduino.puck_dropped_in_col(3)
-        self.arduino.puck_dropped_in_col(3)
+        pass
         
         # self.game.board.display()
     
