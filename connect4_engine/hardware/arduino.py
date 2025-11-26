@@ -57,9 +57,8 @@ class ArduinoCommunicator(IArduino):
         self._logger.info("Start signal from Arduino")
         self._accept_moves = True
 
-    # Optional: methods Game can call to notify Arduino
     def reset(self):
-        msg = f"GAME_OVER\n"
+        msg = f"RESET\n"
         self._logger.info(f"Sending to Arduino: {msg.strip()}")
         self._ser.write(msg.encode("utf-8"))
         self._accept_moves = False
