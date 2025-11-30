@@ -13,7 +13,7 @@ class Connect4Game:
                  robot: IRobot,
                  player_starts: bool = False):
         self.board = Board()
-        self.ai = AIPascalPons(ai_executable_path="connect4_engine/core/connect4ai/connect4/c4solver")
+        self.ai = AIPascalPons(ai_executable_path="connect4_engine/core/c4solver.exe")
         self.robot = robot
         self.logger = logger
         self.arduino = arduino
@@ -79,6 +79,8 @@ class Connect4Game:
     def ai_turn(self):
         # AI's turn 
         ai_column = self.ai.choose_move(self.board)
+        self.robot.drop_piece(ai_column, self.turns_taken['ai'])
+        self.turns_taken['ai'] += 1
         self.board.drop_piece(ai_column, Connect4Game.AI_COLOR) # ledstrip doesn't detect ai piece drop bc it falls under it.
         self.logger.info(f"AI dropped piece in column {ai_column}")
         if self.check_winner():

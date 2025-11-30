@@ -8,20 +8,20 @@ from core.board import Board
 
 class Main:
     def __init__(self):
-        # self.arduino = ArduinoCommunicator(ser=serial.Serial('COM7', 115200))
-        # self.robot = RobotCommunicator()
-        self.arduino = ArduinoDummy()
-        self.robot = RobotDummy(arduino=self.arduino)
+        self.arduino = ArduinoCommunicator(ser=serial.Serial("COM3", 115200))
+        self.robot = RobotCommunicator("COM11")
+        # self.arduino = ArduinoDummy()
+        # self.robot = RobotDummy(arduino=self.arduino)
         self.game = Connect4Game(arduino=self.arduino, robot=self.robot, player_starts=False)
     
     def play(self):
-        self.game.game_start()
-        self.arduino.puck_dropped_in_col(3)
-        self.arduino.puck_dropped_in_col(2)
-        self.arduino.puck_dropped_in_col(3)
-        self.arduino.puck_dropped_in_col(0)
+        # self.game.game_start()
+        # self.arduino.puck_dropped_in_col(3)
+        # self.arduino.puck_dropped_in_col(2)
+        # self.arduino.puck_dropped_in_col(3)
+        # self.arduino.puck_dropped_in_col(0)
 
-        # self.arduino.read_loop()  # in real hardware this would be the only thing running.
+        self.arduino.read_loop()  # in real hardware this would be the only thing running.
 
     
 if __name__ == "__main__":

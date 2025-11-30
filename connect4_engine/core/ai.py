@@ -22,13 +22,12 @@ class AIPascalPons:
     def __init__(self, ai_executable_path: str):
         self.ai_executable_path = ai_executable_path
         self.proc = subprocess.Popen(
-            [self.ai_executable_path, "-a"],
+            [self.ai_executable_path, "-a", "-b", "connect4_engine/core/7x6.book"],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,      # work with str instead of bytes
         )
-        self.proc.stdout.readline()
 
     def choose_move(self, board: Board):
         """
@@ -41,6 +40,7 @@ class AIPascalPons:
         # send a string
         self.proc.stdin.write(board.pons_string + "\n")
         self.proc.stdin.flush() # ensure it's sent
+        logger.debug(f"Sent board state to AI: {board.pons_string}")
         out = self.proc.stdout.readline()
         return int(out.strip())
         # stdout, stderr = process.communicate(input=board.pons_string)
@@ -56,7 +56,7 @@ class AIPascalPons:
 def main():
     # Example usage
     board = Board()
-    ai_player = AIPascalPons(ai_executable_path="connect4_engine/core/connect4ai/connect4/c4solver")
+    ai_player = AIPascalPons(ai_executable_path="connect4_engine/core/c4solver")
     move = ai_player.choose_move(board)
     print(f"AI chose column: {move}")
 # if __name__ == "__main__":  
