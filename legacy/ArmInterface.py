@@ -4,10 +4,10 @@ from pymycobot.genre import Coord
 from typing import *
 import logging
 # from core.logger import get_logger
-from logging import getLogger as get_logger
+from connect4_engine.utils.logger import logger
 from pymycobot import MyCobotSocket
 
-logger = get_logger(__name__)
+# logger = get_logger(__name__)
 
 class ArmInterface:
     def __init__(self, port: str, baudrate: int):

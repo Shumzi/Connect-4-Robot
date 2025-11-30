@@ -7,7 +7,8 @@ const int btn_pin = 5;      //The start button
 const int btn_ms_time = 1;  //Time for button to register a press
 const int pump_pin = 7;
 const int valve_pin = 6;
-
+const int DEBOUNCE_MS = 1000;
+unsigned long last_change_ms = 0;
 byte solenoid_state = 0;
 
 // Timing variables
@@ -26,6 +27,7 @@ typedef enum {
 
 void setup() {
   Serial.begin(115200);
+  Serial.println("setting up");
   pinMode(latch_pin, OUTPUT);
   pinMode(load_pin, OUTPUT);
   pinMode(btn_pin, INPUT);
@@ -44,13 +46,14 @@ void setup() {
   SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0));
 
   writeToSr(solenoid_state);
+  Serial.println("START"); // later on will only turn on when button is pressed.
 }
 void loop() {
   handleDiscDetection();
-  handleButtonPress();
-  handlePump();
+  // handleButtonPress();
+  // handlePump();
   if (Serial.available()) {
-    handle_cmd(Serial.read());
+    handle_cmd(Serial.readStringUntil('\n'));
   }
   delay(1);
 }
@@ -86,6 +89,10 @@ void update165() {
 }
 
 void handleDiscDetection() {
+
+  unsigned long now = millis();
+  if(!(now > last_change_ms + DEBOUNCE_MS))
+    return;
   static byte last_data = 0;
 
   update165();
@@ -93,8 +100,12 @@ void handleDiscDetection() {
 
   //we have a rising edge
   if (data != 0 && last_data == 0) {
-    byte msg = build_message_byte(DISC_CMD, bit_index(data), 0);
-    Serial.write(msg);
+    last_change_ms = now;
+    Serial.print("DROP ");
+    Serial.println(__builtin_ctz(data));
+  }
+  else if (data == 0 && last_data != 0) {
+    Serial.println("LOG light renewed :)");
   }
 
   last_data = data;
@@ -121,8 +132,6 @@ int bit_index(byte x) {
 }
 
 
-
-
 void handleButtonPress() {
   static int prevPressed = LOW;
   static unsigned long pressStart = 0;
@@ -141,36 +150,45 @@ void handleButtonPress() {
   }
 }
 
-void ack(byte msg) {
-  Serial.write(msg | (0b1 << 7));
-}
-void handle_cmd(byte msg) {
-  CMDS cmd = (msg >> 4) & 0b111;
-  int val = msg & 0b1111;
-  int success = 0;
-  switch (cmd) {
-    case SOLENOID_CMD:
-      if (val < 0 || val > 7) break;
-
-      if (val == 0) {
-        solenoid_state = 0;
-        writeToSr(0);
-      } else {
-        writeToSr(1 << (val - 1));
-        solenoid_state = 1 << (val - 1);
-      }
-      success = 1;
-      break;
-    case PUMP_CMD:
-      if (val == 1) {
-        turnOnPump();
-      } else if (val ==  0) {
-        shutOffPump();
-      }
-      break;
+void turn_off_solenoids()
+{
+  for(int i=0;i<7;++i)
+  {
+    char msg[40];
+    sprintf(msg,"LOG turn off solenoid %d",i);
+    Serial.println(msg);
   }
-  if (success == 1)
-    ack(msg);
+      // if (val < 0 || val > 7) break;
+
+      // if (val == 0) {
+      //   solenoid_state = 0;
+      //   writeToSr(0);
+      // } else {
+      //   writeToSr(1 << (val - 1));
+      //   solenoid_state = 1 << (val - 1);
+      // }
+      // success = 1;
+      // break;
+}
+
+// void ack(byte msg) {
+//   Serial.write(msg | (0b1 << 7));
+// }
+void handle_cmd(String msg) {
+  int cmdEndIdx = msg.indexOf(' ');
+  String cmd = msg.substring(0,cmdEndIdx);
+  if(cmd == "RESET")
+    turn_off_solenoids();
+  //   case PUMP_CMD:
+  //     if (val == 1) {
+  //       turnOnPump();
+  //     } else if (val ==  0) {
+  //       shutOffPump();
+  //     }
+  //     break;
+  // }
+  // if (success == 1)
+  //   ack(msg);
 }
 
 

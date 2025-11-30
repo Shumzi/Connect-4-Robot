@@ -15,17 +15,22 @@ class Connect4Game:
         self.board = Board()
         self.ai = AIPlayerDummy()
         self.robot = robot
-        self.arduino = arduino
         self.logger = logger
+        self.arduino = arduino
         self.arduino.set_on_puck_dropped_callback(self.piece_dropped_in_board)
-        self.turn = 'ai'
-
+        self.arduino.set_game_start_callback(self.game_start)
+        self.turns_taken = {'player': 0, 'ai': 0}
+        self.player_starts = player_starts
         # possibly setup robot and arduino if not done elsewhere
 
+    def game_start(self):
         # initial turn
-        if player_starts:
+        if self.player_starts:
             self.turn = 'player'
-            self.robot.give_player_puck()
+            self.robot.give_player_puck(self.turns_taken['player'])
+        else:
+            self.turn = 'ai'
+            self.ai_turn()
 
     def game_over(self, message: str):
         """
@@ -43,13 +48,15 @@ class Connect4Game:
         note we're only updating the board when the ledstrip detects a piece drop,
         not just when we tell the robot to insert it there.
         """
+        self.turns_taken[self.turn] += 1
         if self.turn == 'ai':
             self.board.drop_piece(column, Connect4Game.AI_COLOR)
             self.logger.info(f"AI dropped piece in column {column}")
             if self.check_winner():
                 return
             self.turn = 'player'
-        else:
+            self.robot.give_player_puck(self.turns_taken['player'])
+        else: # player's turn, i.e. self.turn == 'player'
             self.board.drop_piece(column, Connect4Game.PLAYER_COLOR)
             self.logger.info(f"Player dropped piece in column {column}")
             if self.check_winner():
@@ -75,6 +82,7 @@ class Connect4Game:
     def ai_turn(self):
         # AI's turn 
         ai_column = self.ai.choose_move(self.board)
-        self.robot.drop_piece(ai_column)
-        self.robot.give_player_puck()
+        self.robot.drop_piece(ai_column, self.turns_taken['ai'])
+        self.board.drop_piece(ai_column, Connect4Game.AI_COLOR) # ledstrip doesn't detect ai piece drop bc it falls under it.
+        self.logger.info(f"AI dropped piece in column {ai_column}")
     
