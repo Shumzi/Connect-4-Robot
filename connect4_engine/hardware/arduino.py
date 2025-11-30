@@ -1,7 +1,7 @@
 from typing import Callable
 
 from abc import ABC, abstractmethod
-from connect4_engine.utils.logger import logger
+from utils.logger import logger
 import serial
 
 class IArduino(ABC):

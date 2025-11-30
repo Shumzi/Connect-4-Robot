@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Tuple
-from connect4_engine.utils.logger import logger
+from utils.logger import logger
 
 
 class Board:
@@ -16,6 +16,7 @@ class Board:
         # Initialize board dimensions
         self.width = 7
         self.height = 6
+        self.pons_string = ''
         self.grid = np.full((self.height, self.width), Board.P_EMPTY, dtype=np.int8)
 
         # Initialize game status
@@ -135,8 +136,10 @@ class Board:
         if self.is_col_valid(col):
             row = self.available_cell(col)
             self.grid[row][col] = player
+            self.pons_string += str(col + 1) # assuming turns are always valid
         else:
             raise Exception(f"Not valid move. Column {col} is full.")
+        self.display()
 
     def check_board_state_valid(self):
         count_red = 0

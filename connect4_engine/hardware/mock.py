@@ -1,7 +1,7 @@
 from typing import Callable, Optional
 from .arduino import IArduino
 from .robot import IRobot
-from connect4_engine.utils.logger import logger
+from utils.logger import logger
 
 class ArduinoDummy(IArduino):
     def __init__(self):
@@ -12,6 +12,9 @@ class ArduinoDummy(IArduino):
         Set the callback function to be called when a player move is detected.
         """
         self.on_puck_dropped_callback = callback
+
+    def set_game_start_callback(self, callback: Callable[[], None]):
+        self.game_start = callback
 
     def puck_dropped_in_col(self, column: int):
         """
@@ -38,7 +41,7 @@ class RobotDummy(IRobot):
     def __init__(self, arduino: ArduinoDummy):
         self.arduino = arduino
 
-    def drop_piece(self, column: int):
+    def drop_piece(self, column: int, puck_no: int):
         """
         Simulate dropping a piece in the specified column using the robot hardware.
         """
@@ -50,7 +53,7 @@ class RobotDummy(IRobot):
     return to home position""")
         self.arduino.puck_dropped_in_col(column)
 
-    def give_player_puck(self):
+    def give_player_puck(self, puck_no: int):
         """
         Simulate giving a puck to the player.
         """

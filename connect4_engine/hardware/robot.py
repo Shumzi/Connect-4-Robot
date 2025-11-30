@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from legacy.ArmInterface import ArmInterface
+# from legacy.ArmInterface import ArmInterface
 from pymycobot import MyCobot280
-from connect4_engine.utils.logger import logger
+from utils.logger import logger
 import time
 import json
 
