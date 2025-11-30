@@ -92,9 +92,9 @@ class Calibration:
             except KeyboardInterrupt:
                 break
 
-
 if __name__ == "__main__":
     m = MyCobot("COM11")  # adjust port as needed
     calibration = Calibration(m)
     calibration.calibrate()
+    # todo: understand why get_angles() can give you angles that you can't send back to the robot.
     # calibration.play()
