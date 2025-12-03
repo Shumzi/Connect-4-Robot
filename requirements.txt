@@ -1,5 +1,0 @@
-pymycobot
-numpy
-pyyaml
-pytest
-opencv-python
