@@ -34,6 +34,7 @@ void setup() {
   SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0));
 
   writeToSr(solenoid_state);
+  turn_off_solenoids();
   Serial.println("START"); // later on will only turn on when button is pressed.
   pump_on_off();
 }
@@ -49,7 +50,7 @@ void pump_on_off()
 }
 
 void loop() {
-
+  turn_off_solenoids();
   // handleDiscDetection();
   // // handleButtonPress();
   // // handlePump();
@@ -57,7 +58,6 @@ void loop() {
   //   handle_cmd(Serial.readStringUntil('\n'));
   // }
   // delay(1);
-  turn_off_solenoids();
 }
 void handlePump() {
   if (pumpRunning && (millis() - pumpStartTime >= pumpTimeout)) {
@@ -146,22 +146,23 @@ void turn_off_solenoids()
   for(int i=0;i<7;++i)
   {
     char msg[40];
-    sprintf(msg,"LOG turn off solenoid %d",i);
+    solenoid_state = 1 << i;
+    sprintf(msg,"LOG turn off solenoid %d w value %d",i, solenoid_state);
     Serial.println(msg);
     writeToSr(1 << i);
     delay(1000);
   }
-      // if (val < 0 || val > 7) break;
+  // if (val < 0 || val > 7) break;
 
-      // if (val == 0) {
-      //   solenoid_state = 0;
-      //   writeToSr(0);
-      // } else {
-      //   writeToSr(1 << (val - 1));
-      //   solenoid_state = 1 << (val - 1);
-      // }
-      // success = 1;
-      // break;
+  // if (val == 0) {
+  //   solenoid_state = 0;
+  //   writeToSr(0);
+  // } else {
+  //   writeToSr(1 << (val - 1));
+  //   solenoid_state = 1 << (val - 1);
+  // }
+  // success = 1;
+  // break;
 }
 
 // void ack(byte msg) {
