@@ -65,10 +65,22 @@ class ArduinoCommunicator(IArduino):
         self.game_start()
 
     def reset(self):
-        msg = f"RESET\n"
+        self.send_message("RESET")
+        self._accept_moves = False
+    
+    def turn_on_pump(self):
+        self.send_message("PUMP ON")
+    
+    def turn_off_pump(self):
+        self.send_message("PUMP OFF")
+    
+    def release_pump(self):
+        self.send_message("PUMP RELEASE")
+    
+    def send_message(self, message: str):
+        msg = f"{message}\n"
         self._logger.info(f"Sending to Arduino: {msg.strip()}")
         self._ser.write(msg.encode("utf-8"))
-        self._accept_moves = False
 
 if __name__ == "__main__":
     arduino = ArduinoCommunicator(ser=serial.Serial('COM3', 115200))

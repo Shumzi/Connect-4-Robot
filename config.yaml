@@ -3,3 +3,11 @@ logging:
   output: BOTH # Options: STDOUT, FILE, BOTH
   logfile: game.log
   overwrite: true
+
+hardware:
+  robot:
+    port: "COM11"  # or load from config
+    angles_file: "robot_arm/robot_angles.json"  # path relative to project root
+  arduino:
+    port: "COM3"
+    baudrate: 115200

@@ -27,7 +27,7 @@ class RobotCommunicator(IRobot):
         self.valve_pin = 2
         self.VACCUM_BUILD_TIME = 0.1 #seconds
         self.VACCUM_DROP_TIME = 0.2 #seconds
-        self.robot.sync_send_angles(self.angles["0"], 50)
+        self.robot.sync_send_angles(self.angles["home"], 50)
 
     
     def load_angles(self):

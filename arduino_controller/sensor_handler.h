@@ -8,8 +8,8 @@ const int latch_pin = 4;    //595 - write
 const int btn_pin = 5;      //The start button
 
 const int btn_ms_time = 1;  //Time for button to register a press
-const int pump_pin = 5;
-const int release_pump_pin = 6;
+const int pump_pin = 8;
+const int release_pump_pin = 7;
 const int DEBOUNCE_MS = 1000;
 unsigned long last_change_ms = 0;
 byte solenoid_state = 0;
@@ -37,29 +37,44 @@ void writeToSr(byte data) {
   SPI.transfer(data);             // Send output byte
   digitalWrite(latch_pin, HIGH);  // Latch output
 }
-void pump_on_off()
-{
-  digitalWrite(pump_pin, HIGH);
-  digitalWrite(release_pump_pin, LOW);
-  delay(1000);
-  digitalWrite(pump_pin, LOW);
-  digitalWrite(release_pump_pin, HIGH);
-  delay(1000);
-}
 
 
 void turnOnPump() {
-  digitalWrite(pump_pin, LOW);
-  digitalWrite(release_pump_pin, HIGH);
+  digitalWrite(pump_pin, HIGH);
+  digitalWrite(release_pump_pin, LOW);
+  Serial.println("LOG: PUMP ON");
   pumpStartTime = millis();
   pumpRunning = true;
 }
 
 void shutOffPump() {
-  digitalWrite(pump_pin, HIGH);
+
+  digitalWrite(pump_pin, LOW);
   digitalWrite(release_pump_pin, LOW);
   pumpRunning = false;
+  Serial.println("LOG: pump off");
 }
+
+void releasePump() {
+  digitalWrite(pump_pin, LOW);
+  digitalWrite(release_pump_pin, HIGH);
+  pumpRunning = false;
+  Serial.println("LOG: pump release");
+}
+void pump_on_off()
+{
+  
+  turnOnPump();
+  Serial.println("pump on");
+  delay(2000);
+  releasePump();
+  Serial.println("pump release");
+  delay(2000);
+  shutOffPump();
+  Serial.println("pump off");
+}
+
+
 
 void handlePump() {
   if (pumpRunning && (millis() - pumpStartTime >= pumpTimeout)) {
@@ -68,7 +83,6 @@ void handlePump() {
     // //Transmit that the pump has been turned off
     // byte msg = build_message_byte(PUMP_CMD, 0, 0);
     // Serial.write(msg);
-
   }
 }
 void update165() {
@@ -98,6 +112,8 @@ void handleDiscDetection() {
   }
   else if (data == 0 && last_data != 0) {
     Serial.println("LOG light renewed :)");
+    Serial.println("faking picking up a pick then puttine it down");
+    pump_on_off();
   }
 
   last_data = data;
@@ -159,12 +175,15 @@ void turn_off_solenoids()
 // void ack(byte msg) {
 //   Serial.write(msg | (0b1 << 7));
 // }
-void handle_cmd(String msg) {
-  int cmdEndIdx = msg.indexOf(' ');
-  String cmd = msg.substring(0,cmdEndIdx);
+void handle_cmd(String cmd) {
   if(cmd == "RESET")
     turn_off_solenoids();
-
+  else if(cmd == "PUMP ON")
+    turnOnPump();
+  else if(cmd == "PUMP OFF")
+    shutOffPump();
+  else if(cmd == "PUMP RELEASE")
+    releasePump();
 }
 
 

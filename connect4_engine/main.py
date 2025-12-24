@@ -8,7 +8,7 @@ from core.board import Board
 
 class Main:
     def __init__(self):
-        self.arduino = ArduinoCommunicator(ser=serial.Serial("COM3", 115200))
+        self.arduino = ArduinoCommunicator(ser=serial.Serial("COM7", 115200))
         self.robot = RobotCommunicator("COM11")
         # self.arduino = ArduinoDummy()
         # self.robot = RobotDummy(arduino=self.arduino)
