@@ -73,6 +73,27 @@ class Calibration:
         print(f"Calibration data saved")
         
         # Helper function to move to a location by name, with smart routing for puck locations
+        
+        def _move_to_coords(from_name, to_name, speed=50):
+            coords = self.calibration_data[to_name]["coords"]
+            if ('red' in from_name or 'yellow' in from_name) and ('red' in to_name or 'yellow' in to_name):
+                mode = 1
+                mode_name = "linear"
+            else:
+                mode = 0
+                mode_name = "angular"
+            print(f"Moving to {to_name} from {from_name}... using mode {mode_name}")
+            try:
+                self.robot.set_movement_type(mode)
+                self.robot.send_coords(coords, speed)
+                self.robot.set_movement_type(0)
+                sleep(2)  # Wait for movement to complete
+                print(f"Arrived at {to_name}")
+                return True
+            except Exception as e:
+                print(f"Error moving to {to_name}: {e}")
+                return False
+
         def move_to_location(loc_name, description, from_location=None):
             """
             Move to a location, automatically routing through 'top' when moving to/from 'first' locations.
@@ -87,50 +108,22 @@ class Calibration:
                 return False
             
             # Check if target is a "first" location
+            color = None
             if loc_name in ["red_first", "yellow_first"]:
                 color = loc_name.split("_")[0]
-                top_name = f"{color}_top"
-                
-                # If we have a top location and we're not already there, route through it
-                if top_name in self.calibration_data and from_location != top_name:
-                    print(f"Routing through {color} top of stack to avoid rim...")
-                    try:
-                        top_angles = self.calibration_data[top_name]["angles"]
-                        self.robot.send_angles(top_angles, 50)
-                        sleep(2)
-                        print(f"Arrived at {color} top of stack")
-                    except Exception as e:
-                        print(f"Error moving to {color} top: {e}")
-                        return False
-            
-            # Check if we're leaving a "first" location
-            if from_location in ["red_first", "yellow_first"]:
+            elif from_location in ["red_first", "yellow_first"]:
                 color = from_location.split("_")[0]
+
+
+            if color:
                 top_name = f"{color}_top"
-                
-                # Route through top when leaving a "first" location
-                if top_name in self.calibration_data and loc_name != top_name:
-                    print(f"Routing through {color} top of stack to avoid rim...")
-                    try:
-                        top_angles = self.calibration_data[top_name]["angles"]
-                        self.robot.send_angles(top_angles, 50)
-                        sleep(2)
-                        print(f"Arrived at {color} top of stack")
-                    except Exception as e:
-                        print(f"Error moving to {color} top: {e}")
-                        return False
+                print(f'routing through {color} top of stack')
+                success = _move_to_coords(from_location, top_name)
+                if not success:
+                    return False
+                from_location = top_name
+            return _move_to_coords(from_location, loc_name)
             
-            # Now move to the actual target location
-            print(f"Moving to {description}...")
-            try:
-                loc_angles = self.calibration_data[loc_name]["angles"]
-                self.robot.send_angles(loc_angles, 50)
-                sleep(2)  # Wait for movement to complete
-                print(f"Arrived at {description}")
-                return True
-            except Exception as e:
-                print(f"Error moving to {description}: {e}")
-                return False
         
         # First, go from current location to home (with smart routing if needed)
         current_location = name  # We're currently at the location we just marked
@@ -140,30 +133,34 @@ class Calibration:
         print(f"Attempting to move to '{name}' using send_angles...")
         try:
             # Use smart routing when going to the location
-            move_to_location(name, f"'{name}'", from_location="home")
+            success = move_to_location(name, f"'{name}'", from_location="home")
             
-            # Verify we reached the location
-            actual_angles = self.robot.get_angles()
-            if actual_angles:
-                # Check if angles are close (within 5 degrees for each joint)
-                angle_errors = [abs(actual_angles[i] - angles[i]) for i in range(6)]
-                max_error = max(angle_errors)
-                if max_error < 5.0:
-                    print(f"✓ Successfully moved to '{name}' (max angle error: {max_error:.1f}°)")
+            if success:
+                # Verify we reached the location
+                actual_angles = self.robot.get_angles()
+                if actual_angles:
+                    # Check if angles are close (within 5 degrees for each joint)
+                    angle_errors = [abs(actual_angles[i] - angles[i]) for i in range(6)]
+                    max_error = max(angle_errors)
+                    if max_error < 5.0:
+                        print(f"✓ Successfully moved to '{name}' (max angle error: {max_error:.1f}°)")
+                    else:
+                        print(f"⚠ Warning: Movement to '{name}' may have failed (max angle error: {max_error:.1f}°)")
+                        print(f"  Target angles: {angles}")
+                        print(f"  Actual angles: {actual_angles}")
                 else:
-                    print(f"⚠ Warning: Movement to '{name}' may have failed (max angle error: {max_error:.1f}°)")
-                    print(f"  Target angles: {angles}")
-                    print(f"  Actual angles: {actual_angles}")
+                    print(f"⚠ Could not verify movement to '{name}' (could not get angles)")
             else:
-                print(f"⚠ Could not verify movement to '{name}' (could not get angles)")
+                print(f"✗ Failed to move to '{name}' - location may not exist or movement failed")
         except Exception as e:
             print(f"✗ Error moving to '{name}' using send_angles: {e}")
             print(f"  This may indicate impossible angles were recorded")
             import traceback
             traceback.print_exc()
-        
-        # Ensure J6 is locked after all operations
+            success = False
+            
         self.robot.power_on()
+        return success
 
     def free_arm_except_6(self):
         """
@@ -715,15 +712,18 @@ class Calibration:
                 if use_angles:
                     self.robot.sync_send_angles(coords, 50)
                 else:
-                    self.robot.sync_send_coords(coords, 50)
+                    self.robot.synck_send_coords(coords, 50)
                 sleep(0.5)
                 self.mark_location(name)
             else:
                 print(f"Skipping {name}")
         else:
             self.free_arm_except_6()
-            input(f"Press Enter when ready to mark {name}")
-            self.mark_location(name)
+            while True:
+                input(f"Press Enter when ready to mark {name}")
+                success = self.mark_location(name)
+                if success:
+                    break
     
     def calibrate(self, use_keyboard=False, step_size=5.0):
         """
